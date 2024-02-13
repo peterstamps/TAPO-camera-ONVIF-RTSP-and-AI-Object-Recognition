@@ -1,4 +1,14 @@
-IMPORTANT - 
+TAPO C225 and otherTAPO ONVIF camera's
+- Access to motion event messages via ONVIF, 
+- RTSP based Live stream access and video stream recording triggered by motion events send by Tapo camera via ONVIF
+- AI object recognition and interval based creation of snapshot picture with marked detected object(s) with label
+- Lots of easy configuration !
+- Easy to use: run simple python3 myTapoVideoCapture.py
+- To check/test the motion event messages you can separately run python3 myTapoMotionDetection.py
+- Have fun and maybe you can improve it
+
+
+IMPORTANT - THESE ARE REAL WORKABLE EXAMPLE PROGRAM. Not meant as a project for endless development by me!
 This has been tested and works with Tapo Camera C225. It was all tested on a Raspbery Pi 4 with 4MB RAM!
 Room temp 20-21 Celsius, Raspberry Pi 4 sits in a LIRC Aluminium Case, no FAN, Operation Temp was average 42-45 Celcius
 
