@@ -121,11 +121,17 @@ class RTSPVideoWriterObject(object):
         # write the read frames from the memory buffer into video output file when recording is on
         while self.recording_on == True and len(self.deque_of_frames) > 0:   
           # write the first recorded frame in the list and then drop that 
-          frame = self.deque_of_frames.popleft()        
-          self.output_video.write(frame)
-          self.frames_written += 1 
-          self.AIObjectRecognition()   # call AI object recognition 
-
+          frame = self.deque_of_frames.popleft()
+          try:
+            if frame.all():      
+              self.output_video.write(frame)
+              self.frames_written += 1 
+              if cfg.AIserverInstalled:
+                self.AIObjectRecognition()   # call AI object recognition 
+          except Exception as e:
+              print(f"Continue with error: \n{e}",end='\033[K\n')
+              
+            
 
     def start_recorder(self, recording=True):
           self.frames_written = 0 # reset the write frames counter
@@ -179,7 +185,7 @@ class RTSPVideoWriterObject(object):
         self.objectDeltaTime = time.time() - self.lastObjectDetectiontime
         # print(self.objectDeltaTime , '>', self.objectDetectionInterval)
         if self.objectDeltaTime > self.objectDetectionInterval: # every x seconds see cfg.objectDetectionInterval
-          if self.frame.any():
+
             the_frame =  self.frame.copy() 
             if cfg.videoScale <= 1.0:   # downscale by configurable factor
               the_frame = cv2.resize(the_frame, vsw.dimensions, interpolation=cv2.INTER_AREA)  # rescaling using OpenCV
