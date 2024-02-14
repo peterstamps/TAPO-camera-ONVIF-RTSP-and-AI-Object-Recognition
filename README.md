@@ -7,6 +7,7 @@ TAPO C225 and otherTAPO ONVIF camera's
 - Easy to use: run simple python3 myTapoVideoCapture.py
 - To check/test the motion event messages you can separately run python3 myTapoMotionDetection.py
 - Have fun and maybe you can improve it
+- You may want to play with the configuration settings to finetune in order to get the optimal result for your hardware
 
 
 IMPORTANT - THESE ARE REAL WORKABLE EXAMPLE PROGRAM. Not meant as a project for endless development by me!
