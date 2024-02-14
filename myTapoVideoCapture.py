@@ -26,6 +26,7 @@ from datetime import datetime
 import time
 import cv2
 import os
+import sys
 import io
 import urllib3
 import json
@@ -106,7 +107,7 @@ class RTSPVideoWriterObject(object):
                 self.memfull_percentage = ( psutil.virtual_memory().used / psutil.virtual_memory().total ) * 100.0
                 # we save frames in memory to catch the latest frames before motion detection triggers the recording (pre-motion)
                 if self.memfull_percentage > cfg.memoryFull_percentage:   # to avoid an overrun of the memory by saving large frames and numbers of seconds of stream1)
-                  print(f"Memory percentage {self.memfull_percentage} is above threshold of {cfg.memoryFull_percentage}. Dropping recorded frames.", end='\033[K\n')
+                  print(f"Memory percentage {self.memfull_percentage:2.1f} is above threshold of {cfg.memoryFull_percentage}. Dropping recorded frames.", end='\033[K\r')
                   if len(self.deque_of_frames) > 0:
                     self.deque_of_frames.popleft() # drop first frame from deque!
                 else: # enough RAM memory to keep frames                  
@@ -123,9 +124,16 @@ class RTSPVideoWriterObject(object):
         # write the read frames from the memory buffer into video output file when recording is on
         while self.recording_on == True and len(self.deque_of_frames) > 0:   
           # write the first recorded frame in the deque and then drop that 
-          frame = self.deque_of_frames.popleft()  
+          frame = self.deque_of_frames.popleft() 
+          vsw.recording_elapsed_time = (time.time() - vsw.recording_start_time)
+          #print(f"recording_elapsed_time: {vsw.recording_elapsed_time}, recording_start_time: {vsw.recording_start_time}")
+          
+          if vsw.recording_elapsed_time >= vsw.recordDuration: 
+            print(f"Elapsed recording_time: {vsw.recording_elapsed_time:2.0f}s")
+            break
           self.output_video.write(frame)
           self.frames_written += 1 
+          #print(f"writing frame: {self.frameCounter}")
           try:
             if cfg.AIserverInstalled:
               self.AIObjectRecognition()   # call AI object recognition 
@@ -145,7 +153,7 @@ class RTSPVideoWriterObject(object):
             # create a new recording file with time stamp.
             fileName = f"{cfg.storageDirectory}Output_{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.{cfg.videoRecsFiles}"    # file name with date,time stamping
             vsw.set_output_video_file_name(fileName)                        
-            print(f"Recording file created: {fileName}", end='\033[K\n')
+            print(f"Recording in file: {fileName}", end='\033[K\n')
             vsw.recording_file_exists = True  # the recording file has been created
 
 
@@ -282,7 +290,7 @@ if __name__ == '__main__':
             exit(1) 
 
           # print(f" .......", end='\033[K\r') # cleans the whole line but no new line 
-          print(f"frame: {vsw.frameCounter:n} prerecorded: {len(vsw.deque_of_frames)} - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} motionDetected: {'yes' if vsw.motionDetected else 'no '} => Camera UTC time: {vsw.cameraMessages['CurrentTime'].strftime('%Y-%m-%d %H:%M:%S') if vsw.cameraMessages else 'not available'}", end='\033[K\r') # with output include this \n{vsw.cameraMessages}", end='\033[K\r')  
+          print(f"frame: {vsw.frameCounter:n} prerecorded: {len(vsw.deque_of_frames)}={sys.getsizeof(vsw.deque_of_frames):n}bytes - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} motionDetected: {'yes' if vsw.motionDetected else 'no '} => Camera UTC time: {vsw.cameraMessages['CurrentTime'].strftime('%Y-%m-%d %H:%M:%S') if vsw.cameraMessages else 'not available'}", end='\033[K\r') # with output include this \n{vsw.cameraMessages}", end='\033[K\r')  
 
             
           # simulate a motion detection
@@ -315,3 +323,5 @@ if __name__ == '__main__':
 
       except Exception as e:
           print(f"error: \n{e}")
+
+
