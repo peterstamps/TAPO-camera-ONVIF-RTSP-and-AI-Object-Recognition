@@ -2,6 +2,7 @@ TAPO C225 and otherTAPO ONVIF camera's
 - Access to motion event messages via ONVIF, 
 - RTSP based Live stream access and video stream recording triggered by motion events send by Tapo camera via ONVIF
 - AI object recognition and interval based creation of snapshot picture with marked detected object(s) with label
+- AI object recognition can be switched off in the configuration in case you do not have an AI server installed
 - Lots of easy configuration !
 - Easy to use: run simple python3 myTapoVideoCapture.py
 - To check/test the motion event messages you can separately run python3 myTapoMotionDetection.py
@@ -16,36 +17,23 @@ Before running myTapoVideoCapture  with 'python3 myTapoVideoCapture.py' see foll
 
 1) CHECK and ADAPT the parameters in myTapoMotionConfig.py  (paths!, user and password and IP address)
 
-2) Run pip install for missing Python packages!
-When not installed then you need to install the following packages 
+2) Run pip install for missing Python packages! 
+   When not installed then you need to install the listed packages in file Readme_install_these_python_packages.txt
+   Use 'pip install' for following packages. 
+   For your information only: python 3.11 was used in a virtual environment. 
+   This python version might not be required. It probably will work with other python3 versions as well.
+ 
+3) Create a wsdl directory and put the required WSDL files in it. This is how you can do it.
+   - Download the python-onvif-zeep-async SOURCE distribution package at:  https://pypi.org/project/onvif-zeep-async/#files
+     (a direct download is at https://files.pythonhosted.org/packages/68/65/c39f751794b4cd60238b4202fc27d35c81fdc8ea226cc9bead2b983c7818/onvif-zeep-async-3.1.12.tar.gz)
+   - Unzip the onvif-zeep-async-3.1.12.tar.gz to a temporary location (for example in your Downloads folder)
+   - Look in the new folder 'onvif-zeep-async-3.1.12' for folder 'onvif' and inside onvif you find a folder called 'wsdl'.
+   - Copy the wsdl to the desired location and adapt parameter 'cfg.cameraOnvif_wsdl_dir' in myTapoMotionConfig.py
 
-3) You might want to change the locale in myTapoVideoCapture
+4) Optional: You might want to change the locale in myTapoVideoCapture
 import locale
 locale.setlocale(locale.LC_ALL, 'nl_NL.UTF-8')  # prints numbers etc in the Dutch style  like 1.000.000,95
 --------
 
-Use 'pip install' for following packages. 
-The version number listed were installed
-For your information python 3.11 was used in a virtual environment. 
-This might not be required. It probably will work with other python3 versions as well
 
-python-onvif-zeep-async  (onvif_zeep_async-3.1.12 was used)
-python-onvif-zeep        (onvif_zeep-0.2.12 was used)
-onvif         (might come with the packages above)
-easydict     (easydict-1.11 was used)
-asyncio
-logging
-pytz         (pytz-2023.3.post1)
-zeep         (zeep-4.2.1 was used)
-typing
-httpx        (httpx-0.26.0 was used)
-threading 
-opencv-python  (opencv_python-4.9.0.80  was used;  cv2  / opencv2)
-io
-urllib3
-json
-numpy  (numpy-1.26.1 was used)
-psutil
-collections (might be standard installed in python 3.11
 
-Tip: See the imports in the programs to see what else migth be needed. 
