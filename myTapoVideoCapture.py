@@ -107,10 +107,12 @@ class RTSPVideoWriterObject(object):
                 # we save frames in memory to catch the latest frames before motion detection triggers the recording (pre-motion)
                 if self.memfull_percentage > cfg.memoryFull_percentage:   # to avoid an overrun of the memory by saving large frames and numbers of seconds of stream1)
                   print(f"Memory percentage {self.memfull_percentage} is above threshold of {cfg.memoryFull_percentage}. Dropping recorded frames.", end='\033[K\n')
-                  self.deque_of_frames.popleft() # drop first frame from deque!
+                  if len(self.deque_of_frames) > 0:
+                    self.deque_of_frames.popleft() # drop first frame from deque!
                 else: # enough RAM memory to keep frames                  
                   if len(self.deque_of_frames) > self.number_of_frames_to_prerecord: # With 30fps this means 150 frames in memory
-                    self.deque_of_frames.popleft() # drop first frame from deque!
+                    if len(self.deque_of_frames) > 0:
+                      self.deque_of_frames.popleft() # drop first frame from deque!
                   else:
                     self.deque_of_frames.append(self.frame) # add frame to deque
                   
@@ -313,5 +315,3 @@ if __name__ == '__main__':
 
       except Exception as e:
           print(f"error: \n{e}")
-
-
