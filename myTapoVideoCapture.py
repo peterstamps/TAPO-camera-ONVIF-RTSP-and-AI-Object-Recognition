@@ -120,16 +120,15 @@ class RTSPVideoWriterObject(object):
     def write_frames(self):
         # write the read frames from the memory buffer into video output file when recording is on
         while self.recording_on == True and len(self.deque_of_frames) > 0:   
-          # write the first recorded frame in the list and then drop that 
-          frame = self.deque_of_frames.popleft()
+          # write the first recorded frame in the deque and then drop that 
+          frame = self.deque_of_frames.popleft()  
+          self.output_video.write(frame)
+          self.frames_written += 1 
           try:
-            if frame.all():      
-              self.output_video.write(frame)
-              self.frames_written += 1 
-              if cfg.AIserverInstalled:
-                self.AIObjectRecognition()   # call AI object recognition 
+            if cfg.AIserverInstalled:
+              self.AIObjectRecognition()   # call AI object recognition 
           except Exception as e:
-              print(f"Continue with error: \n{e}",end='\033[K\n')
+              print(f"Continue writing frames. Error happened with AI Object Recognition: \n{e}",end='\033[K\n')
               
             
 
