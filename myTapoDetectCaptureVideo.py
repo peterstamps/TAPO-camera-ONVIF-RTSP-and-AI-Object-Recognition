@@ -72,7 +72,7 @@ class camCapture:
         self.isstop = False
         self.frameCounter = 0
         self.capture = cv2.VideoCapture(camID)
-        self.frames_read = 0
+        self.frames_read_for_recording = 0
         self.frames_written = 0
         self.recordDuration = cfg.videoDuration * 60
         self.recording_file_exists = False
@@ -125,14 +125,31 @@ class camCapture:
 
 
     def queryframe(self):
+        # used to record the time when we processed last frame 
+        prev_frame_time = 0
+        # used to record the time at which we processed current frame 
+        new_frame_time = 0
         while (not self.isstop):
             start = time()
             self.status, tmp = self.capture.read()
             self.frameCounter += 1
-            self.frames_read += 1
-            processing_time = (time() - start) *1000
-            #print(f'Read frame processed : {processing_time:2.0f}ms', end='\033[K\r')
-            self.deque_of_frames.append(tmp)
+            new_frame_time = time() 
+            # Calculating the fps 
+            # fps will be number of frames processed in given time frame 
+            # since their will be most of time error of 0.001 second 
+            # we will be subtracting it to get more accurate result 
+            fps = 1/(new_frame_time-prev_frame_time) 
+            prev_frame_time = new_frame_time 
+            # converting the fps into integer 
+            fps = int(fps) 
+            if fps > cfg.TapoFrameSpeed:  # slow speed down to number of real frame speed
+              pass
+            else:
+              if self.recording_on:
+                self.frames_read_for_recording += 1
+              processing_time = (time() - start) *1000
+              #print(f'{fps} - Read frame processed : {processing_time:2.0f}ms', end='\033[K\r')
+              self.deque_of_frames.append(tmp)
         self.capture.release()
         
         
@@ -170,7 +187,8 @@ class camCapture:
           # a recording file will be created at the start of recording and closed(released) when max recording time is reached 
           if self.motionDetected:
                if self.recording_on == False:  
-                  self.recording_on = True     
+                  self.recording_on = True 
+                  self.frames_read_for_recording = 0    
   
           if self.recording_on == True:
               if self.recording_file_exists == True:
@@ -198,7 +216,7 @@ class camCapture:
                     self.recording_file_exists = False # set switch on to make new recording file creation possible
                     self.recording_elapsed_time = 0  # reset the recording elapsed time to zero  
                     self.recording_start_time = 0 # reset the start time the recording 
-                    print(f"Frames read => {cam.frames_read} | {self.frames_written} <= Frames written", end='\033[K\n') 
+                    print(f"Frames read => {cam.frames_read_for_recording} ex. buffer: {len(self.deque_of_frames)} | {self.frames_written} <= Frames written", end='\033[K\n') 
                     break  # important break the while loop! 
 
                   if frame.all() != None:
@@ -213,6 +231,7 @@ class camCapture:
 
               else:
                 self.recording_on = False 
+                self.frames_read_for_recording = 0
                 
 
     def AIObjectRecognition(self, frame, AI_picture_dimensions, lastTimeObjectDetection):
@@ -278,7 +297,7 @@ class camCapture:
                                 # print(f" .......", end='\033[K\r') # cleans the whole line but no new line 
                                 print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} objectDetected: {object['label']}", end='\033[K\r') 
 
-                                break # we creat only one image
+                                #break # we creat only one image
                                   
                       elif "message" in res:
                           print(res["message"])
@@ -344,6 +363,10 @@ if __name__ == '__main__':
         
     # start the thread to read video frames from the camera
     cam.start1(buffer_size=cam.buffer_size)
+    
+    # wait till buffer is filled
+    sleep(cfg.videoRecSecondsBeforeMotion)
+    
     # start the thread to read ONVIF messages from the camera
     cam.start2(interval_time=cfg.cameraMsgQueryInterval)
 
