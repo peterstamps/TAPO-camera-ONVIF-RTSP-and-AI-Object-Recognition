@@ -88,4 +88,4 @@ cfg.font_scale_Label = 0.4 # the font size in the label of the detected object. 
 cfg.colorObjectRectangle = (230, 159, 22) # BGR notation (blue , green, red) ; Code for shade of waterblue => (230, 159, 22) ; code light green => (0, 255, 124)                        
 cfg.colorLabelRectangle = (230, 159, 22)
 cfg.colorLabelText = (0,0,0)
-cfg.ObjectsToDetect = ("person") #, "car", "dog", "cat")  # Must be in a tuple format! Like ("person", "car", "dog", "cat") => Check the AI server models which object are supported
+cfg.ObjectsToDetect = ("person", "car", "dog", "cat")  # Must be in a tuple format! Like ("person", "car", "dog", "cat") => Check the AI server models which object are support
