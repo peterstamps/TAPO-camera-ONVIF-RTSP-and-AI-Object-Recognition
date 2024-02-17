@@ -9,13 +9,16 @@ cfg = edict()
 cfg.videoProtocol         = 'rtsp'
 cfg.cameraUser            = 'user'
 cfg.cameraPassw           = 'password'
-cfg.cameraIP              = '192.168.100.1'
+cfg.cameraIP              = '192.168.100.1' # PUT HERE YOUR CAMERA IP address!
 cfg.cameraPort            = '554'
 cfg.cameraStream          = 'stream2'
+cfg.cameraStream1WxH       = (2560,1440) 
+cfg.cameraStream2WxH       = (1280,720) 
 cfg.cameraOnvifPort       = '2020'
-cfg.cameraOnvif_wsdl_dir  = "/home/user/Documents/onvif/wsdl"  # copy them from python-onvif-zeep-async package to your location
+cfg.cameraOnvif_wsdl_dir  = "<put_here_your_path_to_onvif>/wsdl" # copy them from python-onvif-zeep-async package to your location
 cfg.cameraPrintMessages   = False   # print the XML and HTTP requests (suppress HTTPS request messages with command: python3 montionmain2.py > 2> /dev/null )
 cfg.cameraLogMessages     = 'CRITICAL' # debug, info or critical
+cfg.cameraMsgQueryInterval = 1.0 #  minimal 1.0. The interval between each event message query to avoid overloading the camera
 
 # memoryFull_percentage prevents that setting cfg.videoRecSecondsBeforeMotion and cfg.cameraStream are
 # causing a running out of memory
@@ -54,7 +57,7 @@ cfg.videoFps         = 15    # maximum: 15; For Tapo streams 1 and 2 the RTSP st
 
 # cfg.videoEncoder Must always be 4 characters! 
 # Tapo C225 stream1 (2560x1440 pixels) works with XVID, MJPG and mp4v
-# Tapo C225 stream2 (1280x720  pixels) works with avc1 X264, H264, MJPG and mp4v also RAW but see above
+# Tapo C225 stream2 (1280x720  pixels) works with avc1 X264, H264, MJPG and mp4v also RAW but see above'
 
 cfg.videoEncoder     = 'mp4v'  
 cfg.videoScale       = 0.4 # down-scales video frames size, recommended 0.5 to max 0.8 (Use 0.8 to 1.0 larger only when Yolo5 model is set to medium or large)
@@ -68,17 +71,17 @@ cfg.motionSenseThreshold = 5 # for night cameras with low light, reduce this par
 cfg.motionSenseArea  = 900 # default = 900, The min Area threshold for detection
 
 # used to simulate a motion detected by the Camera, usefull for testing recording and AI object recognition
-cfg.RunMotionSimulation_1 = True  # will trigger MotionDetected to True happens between read of frames 150 and 450
+cfg.RunMotionSimulation_1 = False  # will trigger MotionDetected to True happens between read of frames 150 and 450
 cfg.RunMotionSimulation_2 = False  # will trigger MotionDetected to True happens between read of frames 1050 and 1250
 
 # used to set motion storage location parameters
-cfg.storageDirectory        = r"/home/peter/Pictures/Tapo/"
+cfg.storageDirectory        = r"<put_here_your_path_to_AIpictures>/" # The end slash is required!
 cfg.basenameOjectRecsFiles  = "camera_capture"
 cfg.extensionOjectRecsFiles ="jpg"
 
 # used to set AI server related parameters
 cfg.AIserverInstalled = False # set to False when no AI server is available
-cfg.AIserverUrl    = "http://localhost:32168/v1/vision/detection"
+cfg.AIserverUrl    = "http://localhost:32168/v1/vision/detection" # ADAPT THE IP ADRESS WHEN YOUR AI servers doesn't run local!
 cfg.min_confidence = 0.4 ## min_confidence (Float): The minimum confidence level for an object will be detected. In the range 0.0 to 1.0. Default 0.4.
 cfg.objectDetectionInterval = 2.0 ## every two seconds when recording is on 
 cfg.font_scale_Label = 0.4 # the font size in the label of the detected object. Font is  cv2.FONT_HERSHEY_SIMPLEX 
