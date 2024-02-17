@@ -27,7 +27,9 @@ cfg.memoryFull_percentage = 70.0 # do not accidently add a percentage sign behin
 
 #  do not touch next parameter cfg.videoUrl 
 cfg.videoUrl         = f'{cfg.videoProtocol}://{cfg.cameraUser}:{cfg.cameraPassw}@{cfg.cameraIP}:{cfg.cameraPort}/{cfg.cameraStream}'
-cfg.videoFps         = 15    # maximum: 15; For Tapo streams 1 and 2 the RTSP stream has max 15 FPS
+cfg.videoFps         = 15    # the frame speed of the RTSP Stream! Maximum 15; For Tapo streams 1 and 2 the RTSP stream has max 15 FPS
+# put below the real FrameSpeed that you have set in your Tapo camera settings
+cfg.TapoFrameSpeed   = 30  # real FrameSpeed of tapo Camera
 
 #  Be careful with specifying frame sizes. In the constructor you need to pass the frame size as (column, row) 
 #  e.g. 640x480. However the array you pass in, is indexed as (row, column).
@@ -88,4 +90,4 @@ cfg.font_scale_Label = 0.4 # the font size in the label of the detected object. 
 cfg.colorObjectRectangle = (230, 159, 22) # BGR notation (blue , green, red) ; Code for shade of waterblue => (230, 159, 22) ; code light green => (0, 255, 124)                        
 cfg.colorLabelRectangle = (230, 159, 22)
 cfg.colorLabelText = (0,0,0)
-cfg.ObjectsToDetect = ("person", "car", "dog", "cat")  # Must be in a tuple format! Like ("person", "car", "dog", "cat") => Check the AI server models which object are support
+cfg.ObjectsToDetect = ("person", "car", "dog", "cat")  # Must be in a tuple format! Like ("person", "car", "dog", "cat") => Check the AI server models which object are supported
