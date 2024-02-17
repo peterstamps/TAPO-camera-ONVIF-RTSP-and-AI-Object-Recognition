@@ -147,7 +147,7 @@ class camCapture:
               self.motionDetected = True
             else:
               self.motionDetected = False
-          elif ret_message == 'recording': # 
+          elif self.ret_message == 'recording': # 
             self.motionDetected = True
           else: # Server disconnected without sending a response, probably due to no cameraMessages.
             print(f"A check of the camera might be needed!\n{self.ret_message}", end='\033[K\n')
