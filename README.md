@@ -13,7 +13,7 @@ IMPORTANT - THESE ARE REAL WORKABLE EXAMPLE PROGRAM. Not meant as a project for 
 This has been tested and works with Tapo Camera C225. It was all tested on a Raspbery Pi 4 with 4MB RAM!
 Room temp 20-21 Celsius, Raspberry Pi 4 sits in a LIRC Aluminium Case, no FAN, Operation Temp was average 42-45 Celcius
 
-Before running  'python3 myTapoDetectCaptureVideo.py' OR 'python3 myTapoVideoCapture.py' read following steps!!
+Before running  'python3 myTapoDetectCaptureVideo.py' (PREFERRED!) OR 'python3 myTapoVideoCapture.py' read following steps!!
 
 1) CHECK and ADAPT the parameters in myTapoMotionConfig.py  (paths!, user and password and IP address)
 
