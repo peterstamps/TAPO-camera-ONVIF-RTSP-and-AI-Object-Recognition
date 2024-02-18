@@ -133,6 +133,8 @@ class camCapture:
             start = time()
             self.status, tmp = self.capture.read()
             self.frameCounter += 1
+            if self.recording_on:
+              self.frames_read_for_recording += 1            
             new_frame_time = time() 
             # Calculating the fps 
             # fps will be number of frames processed in given time frame 
@@ -142,14 +144,13 @@ class camCapture:
             prev_frame_time = new_frame_time 
             # converting the fps into integer 
             fps = int(fps) 
-            if fps > cfg.TapoFrameSpeed:  # slow speed down to number of real frame speed
-              pass
-            else:
-              if self.recording_on:
-                self.frames_read_for_recording += 1
-              processing_time = (time() - start) *1000
+           # if fps > cfg.TapoFrameSpeed:  # slow speed down to number of real frame speed
+            #  pass
+          #  else:
+            self.deque_of_frames.append(tmp)
+            processing_time = (time() - start) *1000
               #print(f'{fps} - Read frame processed : {processing_time:2.0f}ms', end='\033[K\r')
-              self.deque_of_frames.append(tmp)
+            
         self.capture.release()
         
         
@@ -196,8 +197,8 @@ class camCapture:
               else:
                 # create a new recording file with time stamp.
                 fileName = f"{cfg.storageDirectory}Output_{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.{cfg.videoRecsFiles}"    # file name with date,time stamping
-                # print(self.codec, cfg.videoFps, (self.frame_width, self.frame_height))
-                self.output_video = cv2.VideoWriter(fileName, self.codec, cfg.videoFps, (self.frame_width, self.frame_height))
+                # print(self.codec, cfg.videoFps, self.recording_frame_dimension)
+                self.output_video = cv2.VideoWriter(fileName, self.codec, cfg.videoFps, self.recording_frame_dimensions)
                 print(f"Recording in file: {fileName}", end='\033[K\n')
                 self.recording_file_exists = True  # the recording file has been created
                 self.recording_start_time = time()
@@ -216,16 +217,19 @@ class camCapture:
                     self.recording_file_exists = False # set switch on to make new recording file creation possible
                     self.recording_elapsed_time = 0  # reset the recording elapsed time to zero  
                     self.recording_start_time = 0 # reset the start time the recording 
-                    print(f"Frames read => {cam.frames_read_for_recording} ex. buffer: {len(self.deque_of_frames)} | {self.frames_written} <= Frames written", end='\033[K\n') 
+                    # print(f"Frames read => {cam.frames_read_for_recording} ex. buffer: {len(self.deque_of_frames)} | {self.frames_written} <= Frames written", end='\033[K\n') 
                     break  # important break the while loop! 
 
                   if frame.all() != None:
+                    the_frame =  frame.copy()
+                    if cfg.videoRecordingResolutionFactor < 1.0:   # downscale by configurable factor
+                      frame = cv2.resize(the_frame, self.recording_frame_dimensions, interpolation=cv2.INTER_AREA)  # rescaling using OpenCV
                     self.output_video.write(frame)
                     self.frames_written += 1  
 
                     try:
                       if cfg.AIserverInstalled:
-                         self.lastTimeObjectDetection = self.AIObjectRecognition(frame, AI_picture_dimensions, self.lastTimeObjectDetection)   # call AI object recognition 
+                         self.lastTimeObjectDetection = self.AIObjectRecognition(frame, self.AI_picture_dimensions, self.lastTimeObjectDetection)   # call AI object recognition 
                     except Exception as e:
                          print(f"Continue writing frames. Error happened with AI Object Recognition: \n{e}",end='\033[K\n')
 
@@ -241,7 +245,7 @@ class camCapture:
           if self.objectDeltaTime > self.objectDetectionInterval: # every x seconds see cfg.objectDetectionInterval
 
               the_frame =  frame.copy()
-              if cfg.videoScale <= 1.0:   # downscale by configurable factor
+              if cfg.AIpictureResolutionFactor < 1.0:   # scale by configurable factor
                 the_frame = cv2.resize(the_frame, AI_picture_dimensions, interpolation=cv2.INTER_AREA)  # rescaling using OpenCV
               is_success, buffer = cv2.imencode(".jpg", the_frame)
               io_buf = io.BytesIO(buffer)
@@ -297,7 +301,7 @@ class camCapture:
                                 # print(f" .......", end='\033[K\r') # cleans the whole line but no new line 
                                 print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} objectDetected: {object['label']}", end='\033[K\r') 
 
-                                #break # we creat only one image
+                                #break # with break active only one image will be created per detection round
                                   
                       elif "message" in res:
                           print(res["message"])
@@ -354,13 +358,28 @@ if __name__ == '__main__':
     print(f"Start of capturing @ {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}") 
 
     cam = camCapture(camID=cfg.videoUrl)
-    
+    print(f"The capture backend is: {cam.capture.getBackendName()}") 
     # The default resolutions of the frame are obtained (system dependent)
     cam.frame_width = int(cam.capture.get(cv2.CAP_PROP_FRAME_WIDTH))
     cam.frame_height = int(cam.capture.get(cv2.CAP_PROP_FRAME_HEIGHT))     
-    print(f"Frame width x height: {cam.frame_width}x{cam.frame_height}")
-    AI_picture_dimensions = (int(cam.frame_width * cfg.videoScale), int(cam.frame_height * cfg.videoScale))  
-        
+    print(f"Camera {cfg.cameraStream} resolution Width x Height: {cam.frame_width}x{cam.frame_height}")
+
+    if  cfg.cameraStream == 'stream1' and cfg.videoRecordingResolutionFactor > 0.75 and \
+         cfg.videoEncoder.lower() in ('avc1', 'x264', 'h264'):  # these codecs do NOT work with stream1's large resolution
+        # Need to set to max allowed frame resolution to: 1920x1080 which equals to resizing factor 0.75
+        cfg.videoRecordingResolutionFactor = 0.75 
+ 
+    cam.AI_picture_dimensions = (int(cam.frame_width * cfg.AIpictureResolutionFactor), int(cam.frame_height * cfg.AIpictureResolutionFactor))  
+
+    cam.recording_frame_dimensions = (int(cam.frame_width * cfg.videoRecordingResolutionFactor), int(cam.frame_height * cfg.videoRecordingResolutionFactor))  
+
+    print(f"Recording resolution Width x Height: {cam.recording_frame_dimensions[0]}x{cam.recording_frame_dimensions[1]}")
+
+    if cfg.AIserverInstalled == True:
+     print(f"AI object recognition picture resolution Width x Height: {cam.AI_picture_dimensions[0]}x{cam.AI_picture_dimensions[1]}")
+     
+      
+       
     # start the thread to read video frames from the camera
     cam.start1(buffer_size=cam.buffer_size)
     
