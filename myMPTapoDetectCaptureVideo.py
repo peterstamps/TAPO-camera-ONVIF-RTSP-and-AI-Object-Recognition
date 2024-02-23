@@ -21,8 +21,8 @@
 # In about each 2 seconds a ONVIF message is returned to indicate a motion has happened or not 
 # The speed of the recording is somewhat higher in the beginning till object is detected.
 
-from myMPTapoMotionConfig import cfg
-from myMPTapoMotion_dawn_dusk import *
+from my3TapoMotionConfig import cfg
+from myTapoMotion_dawn_dusk import *
 import asyncio
 import logging
 from time import sleep 
@@ -241,11 +241,17 @@ class camCapture:
                   self.recording_elapsed_time = (time() - self.recording_start_time)  
                   print(f"\033[K{color['green']}{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - @frame: {self.frameCounter:n} - Motion detected, recording time elapsed: {self.recording_elapsed_time:2.0f}s < Max. duration: {self.recordDuration:2.0f}s", end=f"{color['off']}\r")                    
 
+                  # while recording add a second extra recording time per detected motion 
+                  # when no motion is detected anymore then the record duration is reset to the max, recording time
+                  # a maximum of 2.5 minutes (hard coded!) of contineous recording is possible  
+                  # it helps to avoid that continuing motions are spread over too much files
+                  # with a relative small max configured cfg.videoDuration.                         
                   if self.recording_on and self.motionDetected:
                     if self.recordDuration < 2.5 * 60: # maximum of 2.5 minutes of recording in one file
-                        self.recordDuration += 1  # add 1 second extra recording time
+                        if self.frameCounter % cfg.videoFps  == 0:
+                          self.recordDuration += 1  
                   else:
-                    self.recordDuration =  cfg.videoDuration * 60 # reset to original value
+                    self.recordDuration =  cfg.videoDuration * 60 # reset duration to original max recording value, it will also the extra 
 
                   if self.recording_elapsed_time > self.recordDuration: 
                     self.output_video.release()  # make sure the file with the recording will be closed properly
