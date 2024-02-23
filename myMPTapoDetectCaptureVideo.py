@@ -241,11 +241,11 @@ class camCapture:
                   self.recording_elapsed_time = (time() - self.recording_start_time)  
                   print(f"\033[K{color['green']}{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - @frame: {self.frameCounter:n} - Motion detected, recording time elapsed: {self.recording_elapsed_time:2.0f}s < Max. duration: {self.recordDuration:2.0f}s", end=f"{color['off']}\r")                    
 
-                  # while recording add a second extra recording time per detected motion 
-                  # when no motion is detected anymore then the record duration is reset to the max, recording time
-                  # a maximum of 2.5 minutes (hard coded!) of contineous recording is possible  
-                  # it helps to avoid that continuing motions are spread over too much files
-                  # with a relative small max configured cfg.videoDuration.                         
+                  # While recording and new motions have been detected an extra recording second will be added. 
+                  # This will allow continuously recording ABOVE the max recording time till a absolute maximum 
+                  # of 2.5 minutes.
+                  # It will help to avoid spreading continuously movements into multiple recording files 
+                  # due to a relative short configured maximum recording duration: cfg.videoDuration. 
                   if self.recording_on and self.motionDetected:
                     if self.recordDuration < 2.5 * 60: # maximum of 2.5 minutes of recording in one file
                         if self.frameCounter % cfg.videoFps  == 0:
