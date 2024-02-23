@@ -117,7 +117,7 @@ class camCapture:
 
 
     def start1(self, buffer_size):
-        print(f'Camera starts filling max. buffer size of {self.buffer_size} frames')
+        print(f'Camera starts filling max. buffer size of {self.buffer_size} frames equals to {cfg.videoRecSecondsBeforeMotion}s')
         t1 = Thread(target=self.queryframe, daemon=True, args=())
         t1.start()
 
@@ -234,12 +234,25 @@ class camCapture:
                 self.recording_file_exists = True  # the recording file has been created
                 self.recording_start_time = time()
                 self.recording_elapsed_time = 0 
+                self.recordDuration =  cfg.videoDuration * 60 # reset duration to original max recording value, it will also the extra 
+                
                 
               if self.recording_file_exists == True:  
                 while self.recording_on == True and len(self.deque_of_frames) > 0:  
                   frame = self.getframe() # get a frame(s) from the camera!
                   self.recording_elapsed_time = (time() - self.recording_start_time)  
                   print(f"\033[K{color['green']}{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - @frame: {self.frameCounter:n} - Motion detected, recording time elapsed: {self.recording_elapsed_time:2.0f}s < Max. duration: {self.recordDuration:2.0f}s", end=f"{color['off']}\r")                    
+
+                  # While recording and new motions have been detected an extra recording second will be added. 
+                  # This will allow continuously recording ABOVE the max recording time till a absolute maximum 
+                  # of 2.5 minutes.
+                  # It will help to avoid spreading continuously movements into multiple recording files 
+                  # due to a relative short configured maximum recording duration: cfg.videoDuration.
+                  if self.frameCounter % cfg.TapoFrameSpeed == 0 and self.motionDetected: # check every second
+                    if self.recording_elapsed_time > (self.recordDuration - cfg.videoMotionDetectedJustBeforeEndofRecordDuration) and self.motionDetected:
+                      if self.recordDuration < 2.5 * 60: # maximum of 2.5 minutes of recording in one file
+                            self.recordDuration += cfg.videoMotionDetectedExtraTimeJustBeforeEndofRecordDuration  
+ 
 
                   if self.recording_elapsed_time > self.recordDuration: 
                     self.output_video.release()  # make sure the file with the recording will be closed properly
