@@ -1,6 +1,7 @@
 IMPORTANT - 
 This has been tested and works with Tapo Camera C225. It was all tested on a Raspbery Pi 4 with 4MB RAM!
-Room temp 20-21 Celsius, Raspberry Pi 4 sits in a LIRC Aluminium Case, no FAN, Operation Temp was average 42-45 Celcius
+Room temp 20-21 Celsius, Raspberry Pi 4 sits in a LIRC Aluminium Case, no FAN, Operation Temp was average 42-45 Celcius for myTapoDetectCaptureVideo.py
+The multiprocessing version operating temperature is some 3 to 5 degrees higher!
 
 Before running myTapoVideoCapture  with 'python3 myTapoVideoCapture.py' see following steps
 
@@ -37,5 +38,7 @@ json
 numpy  (numpy-1.26.1 was used)
 psutil
 collections (might be standard installed in python 3.11
+multiprocessing
+easydict
 
 Tip: See the imports in the programs to see what else migth be needed. 
