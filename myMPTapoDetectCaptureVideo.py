@@ -413,12 +413,12 @@ class myCamMsgs:
         if cameraMessages:
           cur_time = f"Camera Current Time: {cameraMessages['CurrentTime'].strftime('%Y-%m-%d %H:%M:%S')}"
           if cameraMessages['NotificationMessage'] != []:
-            ret_message = f"Motion Detected. {cur_time}"
+            ret_message = f"Motion Detected."
           else:
-            ret_message = f"No Notification received. {cur_time}"   
+            ret_message = f"No Notification received."   
         else:
           ret_message = "No cameraMessages received." 
-        self.sharedQueue.put(ret_message)  
+        self.sharedQueue.put(f'{ret_message} {cur_time}')  
         
         #print(f"{color['blue']}{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Send: {ret_message}",  end=f"{color['off']}\033[K\n")        
         await subscription.Renew(termination_time)  
