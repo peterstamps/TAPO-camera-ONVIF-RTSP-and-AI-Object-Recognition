@@ -3,7 +3,7 @@ import datetime
 from datetime import date
 from astral.sun import sun
 import pytz
-from myMPTapoMotionConfig import cfg
+from my3TapoMotionConfig import cfg
 
 mycity = cfg.mycity
 mycountry = cfg.mycountry
@@ -77,7 +77,7 @@ def get_adapted_confidence(this_time):
       code = 'M'   
       seconds = (this_time - my_dawn).total_seconds() 
       new_confidence = confidence_night +  ((confidence_change_per_second_morning * (this_time - my_dawn).total_seconds()))
-#      print(f'Morning:{hit_morning} new_confidence:{new_confidence} + {this_time.strftime("%Y-%m-%d %H:%M:%S")} - {my_dawn.strftime("%Y-%m-%d %H:%M:%S")}')
+#      print(f'Morning:{hit_morning} new_confidence:{new_confidence} - {this_time.strftime("%Y-%m-%d %H:%M:%S")} - {my_dawn.strftime("%Y-%m-%d %H:%M:%S")}')
     elif hit_evening: 
       code = 'E'
       seconds = (this_time - my_sunset).total_seconds()   
