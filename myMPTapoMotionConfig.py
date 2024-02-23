@@ -63,10 +63,6 @@ cfg.videoMotionDetectedJustBeforeEndofRecordDuration = 2.1 # In seconds.
 cfg.videoMotionDetectedExtraTimeJustBeforeEndofRecordDuration = 1.2 # in seconds. The time extra added ro RecordDuration
 cfg.videoRecsFiles = "avi" # Format to write the video frames. Only use '.avi', it's just a container, the codec is the important thing.
 
-# used to set motion sensitivity parameters
-cfg.motionSenseThreshold = 5 # for night cameras with low light, reduce this parameter below 10, This is the threshold pixel value for motion perception. 
-cfg.motionSenseArea  = 900 # default = 900, The min Area threshold for detection
-
 # used to simulate a motion detected by the Camera, usefull for testing recording and AI object recognition
 cfg.RunMotionSimulation_1 = False  # will trigger MotionDetected to True happens between read of frames 150 and 450
 cfg.RunMotionSimulation_2 = False  # will trigger MotionDetected to True happens between read of frames 1050 and 1250
