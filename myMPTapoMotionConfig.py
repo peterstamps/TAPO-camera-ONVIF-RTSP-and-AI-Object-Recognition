@@ -53,7 +53,7 @@ cfg.TapoFrameSpeed   = 15  # real FrameSpeed of tapo Camera
 # cfg.videoEncoder Must always be 4 characters, so also spaces when needed! 
 cfg.videoEncoder     = 'H264'  # 
 cfg.videoRecordingResolutionFactor = 1.0 # resize frames size before writing them, some videoEncoder have a max allowed frame resolution: 1920x1080
-cfg.videoDuration    = 0.2 # In minutes. Max. recording duration e.g. 0.4 => 20s, 0.3 => 18s, 0.2 => 12s, 0.15 => 9s
+cfg.videoDuration    = 0.15 # In minutes. Max. recording duration e.g. 0.4 => 20s, 0.3 => 18s, 0.2 => 12s, 0.15 => 9s
 cfg.videoRecSecondsBeforeMotion = 3 # In seconds. recommended: 5 -> max 10 seconds for Tapo stream2 (1280x720), 2 -> max 3 seconds for Tapo stream1 (2560x1440),
 # Next parameter. Seconds setting should be higher then the Camera detection response time (~ 2 seconds) 
 # Add extra recording time in seconds (see cfg.videoDuration)  when when new motion(s) are dected just 
