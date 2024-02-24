@@ -44,8 +44,8 @@ async def myTapo(continuously=False):
 ###  print (f"pullpoint_mngr: {pullpoint_mngr}")  # returns pullpoint_mngr: <onvif.managers.PullPointManager object>
   
   # create the subscription 
-  subscription = await mycam.create_subscription_service("PullPointSubscription")
-### print(f"subscription: {subscription}")  print(f"subscription: {subscription}")
+  #  do not use this line for Tapo C225 => subscription = await mycam.create_subscription_service("PullPointSubscription")
+  ### print(f"subscription: {subscription}")  print(f"subscription: {subscription}")
 
   # create the pullpoint  
   pullpoint = await mycam.create_pullpoint_service()
@@ -65,9 +65,10 @@ async def myTapo(continuously=False):
       #print(cameraMessages)
       # renew the subscription makes sense when looping over 
       termination_time = (
-         (dt.datetime.utcnow() + dt.timedelta(days=1,hours=1,seconds=3))
+         (dt.datetime.utcnow() + dt.timedelta(days=1,hours=1,seconds=1))
             .isoformat(timespec="seconds").replace("+00:00", "Z")
         )  
+      # do not use this line for Tapo C225 => await subscription.Renew(termination_time)
       # Only use this line in a while loop: await subscription.Renew(termination_time)
       # END here we could loop endless over the cameraMessages with --> while True:  and print(cameraMessages) at the end of while loop
   else:
@@ -76,25 +77,23 @@ async def myTapo(continuously=False):
       # print(cameraMessages)
       # renew the subscription makes sense when looping over 
       termination_time = (
-         (dt.datetime.utcnow() + dt.timedelta(days=1,hours=1,seconds=3))
+         (dt.datetime.utcnow() + dt.timedelta(days=1,hours=1,seconds=1))
             .isoformat(timespec="seconds").replace("+00:00", "Z")
         )  
-      # Only use this line in a while loop: await subscription.Renew(termination_time)
-      # END here we could loop endless over the cameraMessages with --> while True:  and print(cameraMessages) at the end of while loop    
       # we close the pullpoint . This makes sense when no While loop is used  
       await pullpoint.close()
       await mycam.close()  
       return cameraMessages
 
-def motionDetection():
+def motionDetection(continuously=False):
   while True: 
-
-    loop = asyncio.get_event_loop()
-    cameraMessages = loop.run_until_complete(myTapo(continuously=False))
-    ret_message = "ok"
-  #  except Exception as err:
-  #    cameraMessages = []
-  #    ret_message = "Server disconnected without sending a response, probably due to no cameraMessages."
+    try:
+      loop = asyncio.get_event_loop()
+      cameraMessages = loop.run_until_complete(myTapo(continuously=continuously))
+      ret_message = "ok"
+    except Exception as err:
+      cameraMessages = []
+      ret_message = "Server disconnected without sending a response, probably due to no cameraMessages."
     return ret_message, cameraMessages
 
 
@@ -108,7 +107,7 @@ if __name__ == "__main__":
   prtline2 = "- -"*16  
   now = datetime.now()   
   while True:
-    ret_message, cameraMessages = motionDetection()
+    ret_message, cameraMessages = motionDetection(continuously=False)
     now2 = datetime.now()
     time_passed_seconds = now2 - now
     if prt: print(f"Passed time in total seconds: {time_passed_seconds}")        
