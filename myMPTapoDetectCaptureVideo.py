@@ -103,6 +103,7 @@ class camCapture:
         self.motionDetectionRunning = False
         self.motionDetected = False
         self.cameraMessages  = None
+        self_curr_time = None
         self.ret_message = None
         self.objectDetectionInterval = cfg.objectDetectionInterval
         self.lastTimeObjectDetection = 0.0
@@ -132,7 +133,7 @@ class camCapture:
         while (not self.isstop):
           # Read from the shared Queue
           if self.sharedQueue.empty() == False:
-            self.cameraMessages = self.sharedQueue.get(True,1)
+            self.cameraMessages, self.curr_time = self.sharedQueue.get(True,1)
 #The "\033[K" number controls the behaviour of the EL sequence:
 #
 #    0: clear forward till end of line (default)
@@ -140,7 +141,7 @@ class camCapture:
 #    2: clear whole line
 #    EL sequence does not move the cursor
           if not self.recording_on:
-            print(f"{color['magenta']}{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - @frame: {self.frameCounter:n} - {self.cameraMessages}",  end=f'{color["off"]}\033[K\r')
+            print(f"{color['magenta']}{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - @frame: {self.frameCounter:n} - {self.cameraMessages} {self.curr_time}",  end=f'{color["off"]}\033[K\r')
           self.deque_of_msgs.append(self.cameraMessages)
           if len(self.deque_of_msgs) > 0: 
             self.process_videos_AIpictures()
@@ -297,7 +298,7 @@ class camCapture:
               tz_name = cfg.mytimezone
               tz_land = pytz.timezone(tz_name)
               code, new_confidence, seconds, confidence_change_per_second_morning = get_adapted_confidence(datetime.now(tz_land) ) 
-              # print (f'Code: {code}, new_confidence: {new_confidence}, seconds:{seconds}, change/sec: {confidence_change_per_second_morning}')
+              #print (f'Code: {code}, new_confidence: {new_confidence}, seconds:{seconds}, change/sec: {confidence_change_per_second_morning}')
 
 
 
@@ -420,7 +421,7 @@ class myCamMsgs:
             ret_message = f"No Notification received."   
         else:
           ret_message = "No cameraMessages received." 
-        self.sharedQueue.put(f'{ret_message} {cur_time}')  
+        self.sharedQueue.put([ret_message, cur_time])  
         
         #print(f"{color['blue']}{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Send: {ret_message}",  end=f"{color['off']}\033[K\n")        
         # do not use this line for Tapo C225 =>  await subscription.Renew(termination_time)  
