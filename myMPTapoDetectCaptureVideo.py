@@ -385,29 +385,29 @@ class myCamMsgs:
       await self.OnvifCam.update_xaddrs() 
       
       # Create a pullpoint manager. 
-      interval_time = (dt.timedelta(seconds=5))
+      interval_time = (dt.timedelta(seconds=60))
       pullpoint_mngr = await self.OnvifCam.create_pullpoint_manager(interval_time, subscription_lost_callback = Callable[[], None],)
 
       # create the subscription 
-      subscription = await self.OnvifCam.create_subscription_service("PullPointSubscription")
-      while True:
-        # create the pullpoint  
-        pullpoint = await self.OnvifCam.create_pullpoint_service()
-        
-        # call SetSynchronizationPoint to generate a notification message too ensure the webhooks are working.
-        await pullpoint.SetSynchronizationPoint()      
-      
-        # pull the cameraMessages from the camera, set the request parameters
-        # by setting the pullpoint_req.Timeout you define the refreshment speed of the pulls
-        pullpoint_req = pullpoint.create_type('PullMessages') 
-        pullpoint_req.MessageLimit=10
-        pullpoint_req.Timeout = (dt.timedelta(days=0,hours=0,seconds=1))
+      # do not use this line for Tapo C225 => subscription = await self.OnvifCam.create_subscription_service("PullPointSubscription")
 
+      # create the pullpoint  
+      pullpoint = await self.OnvifCam.create_pullpoint_service()
+      
+      # call SetSynchronizationPoint to generate a notification message too ensure the webhooks are working.
+     #  await pullpoint.SetSynchronizationPoint()      
+    
+      # pull the cameraMessages from the camera, set the request parameters
+      # by setting the pullpoint_req.Timeout you define the refreshment speed of the pulls
+      pullpoint_req = pullpoint.create_type('PullMessages') 
+      pullpoint_req.MessageLimit=10
+      pullpoint_req.Timeout = (dt.timedelta(days=0,hours=0,seconds=1))
+      while True:
         cameraMessages = await pullpoint.PullMessages(pullpoint_req)
         #print(f'\033[K{color["yellow"]}',cameraMessages, end=f'{color["off"]}\033[K\n') 
         # renew the subscription makes sense when looping over 
         termination_time = (
-           (dt.datetime.utcnow() + dt.timedelta(days=1,hours=1,seconds=3))
+           (dt.datetime.utcnow() + dt.timedelta(days=1,hours=1,seconds=1))
               .isoformat(timespec="seconds").replace("+00:00", "Z")
           ) 
         if cameraMessages:
@@ -421,7 +421,7 @@ class myCamMsgs:
         self.sharedQueue.put(f'{ret_message} {cur_time}')  
         
         #print(f"{color['blue']}{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Send: {ret_message}",  end=f"{color['off']}\033[K\n")        
-        await subscription.Renew(termination_time)  
+        # do not use this line for Tapo C225 =>  await subscription.Renew(termination_time)  
           
         # we close the pullpoint . This makes sense when no While loop is used  
         #await pullpoint.close()
