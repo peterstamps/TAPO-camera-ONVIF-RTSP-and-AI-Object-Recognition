@@ -297,7 +297,7 @@ class camCapture:
               tz_name = cfg.mytimezone
               tz_land = pytz.timezone(tz_name)
               code, new_confidence, seconds, confidence_change_per_second_morning = get_adapted_confidence(datetime.now(tz_land) ) 
-              print (f'Code: {code}, new_confidence: {new_confidence}, seconds:{seconds}, change/sec: {confidence_change_per_second_morning}')
+              # print (f'Code: {code}, new_confidence: {new_confidence}, seconds:{seconds}, change/sec: {confidence_change_per_second_morning}')
 
 
 
