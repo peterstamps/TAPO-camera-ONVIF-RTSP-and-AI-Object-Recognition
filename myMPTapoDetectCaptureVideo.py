@@ -21,14 +21,14 @@
 # In about each 2 seconds a ONVIF message is returned to indicate a motion has happened or not 
 # The speed of the recording is somewhat higher in the beginning till object is detected.
 
-from my3TapoMotionConfig import cfg
+from myMPTapoMotionConfig import cfg
 from myTapoMotion_dawn_dusk import *
 import asyncio
 import logging
 from time import sleep 
 import datetime as dt
 from datetime import datetime, timedelta
-from pytz import UTC
+from pytz import UTC, timezone
 from zeep import xsd
 from typing import Any, Callable
 from onvif import ONVIFCamera
@@ -294,8 +294,10 @@ class camCapture:
               is_success, buffer = cv2.imencode(".jpg", the_frame)
               io_buf = io.BytesIO(buffer)
 
-              code, new_confidence, seconds, confidence_change_per_second_morning = get_adapted_confidence(datetime.now(pytz.UTC) ) 
-              #print (f'Code: {code}, new_confidence: {new_confidence}, seconds:{seconds}, change/sec: {confidence_change_per_second_morning}')
+              tz_name = cfg.mytimezone
+              tz_land = pytz.timezone(tz_name)
+              code, new_confidence, seconds, confidence_change_per_second_morning = get_adapted_confidence(datetime.now(tz_land) ) 
+              print (f'Code: {code}, new_confidence: {new_confidence}, seconds:{seconds}, change/sec: {confidence_change_per_second_morning}')
 
 
 
