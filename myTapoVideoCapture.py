@@ -130,7 +130,7 @@ def AIObjectRecognition(frame, AI_picture_dimensions, lastTimeObjectDetection):
     if objectDeltaTime > objectDetectionInterval: # every x seconds see cfg.objectDetectionInterval
 
         the_frame =  frame.copy() 
-        if cfg.videoScale <= 1.0:   # downscale by configurable factor
+        if cfg.AIpictureResolutionFactor <= 1.0:   # downscale by configurable factor
           the_frame = cv2.resize(the_frame, AI_picture_dimensions, interpolation=cv2.INTER_AREA)  # rescaling using OpenCV
         is_success, buffer = cv2.imencode(".jpg", the_frame)
         io_buf = io.BytesIO(buffer)
@@ -216,7 +216,7 @@ if __name__ == '__main__':
     frame_width = int(cam.capture.get(cv2.CAP_PROP_FRAME_WIDTH))
     frame_height = int(cam.capture.get(cv2.CAP_PROP_FRAME_HEIGHT))     
     print(f"Frame width x height: {frame_width}x{frame_height}")
-    AI_picture_dimensions = (int(frame_width * cfg.videoScale), int(frame_height * cfg.videoScale))  
+    AI_picture_dimensions = (int(frame_width * cfg.AIpictureResolutionFactor), int(frame_height * cfg.AIpictureResolutionFactor))  
         
     # start the reading frame thread
     cam.start(buffer_size=camera_buffer_size)
