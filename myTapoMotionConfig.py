@@ -55,8 +55,16 @@ cfg.TapoFrameSpeed   = 30  # real FrameSpeed of tapo Camera
 # cfg.videoEncoder Must always be 4 characters, so also spaces when needed! 
 cfg.videoEncoder     = 'H264'  # 
 cfg.videoRecordingResolutionFactor = 1.0 # resize frames size before writing them, some videoEncoder have a max allowed frame resolution: 1920x1080
-cfg.videoDuration    = 0.2 # In minutes. Max. recording duration e.g. 0.4 => 20s, 0.3 => 18s, 0.2 => 12s, 0.15 => 9s
-cfg.videoRecSecondsBeforeMotion = 5 # In seconds. recommended: 5 -> max 10 seconds for Tapo stream2 (1280x720), 2 -> max 3 seconds for Tapo stream1 (2560x1440),
+cfg.videoDuration    = 0.10 # In minutes. Max. recording duration e.g. 0.4 => 20s, 0.3 => 18s, 0.2 => 12s, 0.15 => 9s, 0.10 => 6s
+cfg.videoRecSecondsBeforeMotion = 2 # In seconds. recommended: 5 -> max 10 seconds for Tapo stream2 (1280x720), 2 -> max 3 seconds for Tapo stream1 (2560x1440),
+# Next parameter. Seconds setting should be higher then:
+#  1.  the Camera detection response time (~ 2 seconds) and 
+#  2.  the Object Recognition response time (depends on the configuration of the AI Object Recognition  (fast is <0.4 ms)
+cfg.videoMotionDetectedJustBeforeEndofRecordDuration = 2.1 # In seconds. 
+# Add extra recording time in seconds (see cfg.videoDuration)  when when new motion(s) are dected just 
+# before the maximum recording time has been reached. 
+# Note the: To avoid huge files the absolute maximum recording time per file is hard coded to 2.5 minutes
+cfg.videoMotionDetectedExtraTimeJustBeforeEndofRecordDuration = 2.5 # in seconds. The time extra added to RecordDuration
 cfg.videoRecsFiles = "avi" # Format to write the video frames. Only use '.avi', it's just a container, the codec is the important thing.
 
 # used to set motion sensitivity parameters
