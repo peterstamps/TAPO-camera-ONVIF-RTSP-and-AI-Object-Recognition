@@ -4,6 +4,8 @@
 from easydict import EasyDict as edict
 cfg = edict()
 
+# Disable printing (might be useful when running as a service, to avoid far too much messages in a log file)
+cfg.PrintingOFF = False
 
 # used to set camera and video-related parameters
 cfg.videoProtocol         = 'rtsp'
