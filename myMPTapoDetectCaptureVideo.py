@@ -56,6 +56,14 @@ elif cfg.cameraLogMessages.lower() == "critical":
   logging.getLogger("zeep").setLevel(logging.CRITICAL)
   logging.getLogger("httpx").setLevel(logging.CRITICAL)
 
+if cfg.PrintingOFF:
+# Disable print
+    sys.stdout = open(os.devnull, 'w') 
+else:
+# Restore print
+    sys.stdout = sys.__stdout__ 
+
+
 http = urllib3.PoolManager()
 basename = cfg.basenameOjectRecsFiles
 ext = cfg.extensionOjectRecsFiles
@@ -97,7 +105,7 @@ class camCapture:
         self.frameCounter = 0
         self.frames_read_for_recording = 0
         self.frames_written = 0
-        self.recordDuration = cfg.videoDuration * 60
+        self.recordDuration = cfg.videoDuration * 60  # max
         self.recording_file_exists = False
         self.recording_start_time = 0
         self.motionDetectionRunning = False
@@ -235,12 +243,12 @@ class camCapture:
                 self.recording_file_exists = True  # the recording file has been created
                 self.recording_start_time = time()
                 self.recording_elapsed_time = 0 
-                self.recordDuration =  cfg.videoDuration * 60 # reset duration to original max recording value, it will also the extra 
+                self.recordDuration =  cfg.videoDuration * 60 # reset duration to original max recording value
                 
                 
               if self.recording_file_exists == True:  
                 while self.recording_on == True and len(self.deque_of_frames) > 0:  
-                  frame = self.getframe() # get a frame(s) from the camera!
+                  frame = self.getframe() # get a frame from the deque that includes any prerecorded frame! due to popleft)
                   self.recording_elapsed_time = (time() - self.recording_start_time)  
                   print(f"\033[K{color['green']}{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - @frame: {self.frameCounter:n} - Motion detected, recording time elapsed: {self.recording_elapsed_time:2.0f}s < Max. duration: {self.recordDuration:2.0f}s", end=f"{color['off']}\r")                    
 
@@ -260,7 +268,8 @@ class camCapture:
                     self.recording_on = False # stop recording as record duration was reached  
                     self.motionDetected = False # set camera motion detected switch to off
                     self.recording_file_exists = False # set switch on to make new recording file creation possible
-                    self.recording_elapsed_time = 0  # reset the recording elapsed time to zero  
+                    self.recording_elapsed_time = 0  # reset the recording elapsed time to zero 
+                    self.recordDuration = cfg.videoDuration * 60 # reset duration to original max recording value
                     self.recording_start_time = 0 # reset the start time the recording 
                     # print(f"Frames read => {cam.frames_read_for_recording} ex. buffer: {len(self.deque_of_frames)} | {self.frames_written} <= Frames written", end='\033[K\n') 
                     break  # important break the while loop! 
@@ -298,7 +307,7 @@ class camCapture:
               tz_name = cfg.mytimezone
               tz_land = pytz.timezone(tz_name)
               code, new_confidence, seconds, confidence_change_per_second_morning = get_adapted_confidence(datetime.now(tz_land) ) 
-              #print (f'Code: {code}, new_confidence: {new_confidence}, seconds:{seconds}, change/sec: {confidence_change_per_second_morning}')
+              # print (f'Code: {code}, new_confidence: {new_confidence}, seconds:{seconds}, change/sec: {confidence_change_per_second_morning}')
 
 
 
@@ -351,10 +360,11 @@ class camCapture:
                                 cv2.putText(the_frame, label_confidence, (startX, bottom_line_labelbox ), cv2.FONT_HERSHEY_SIMPLEX, font_scale, text_color, text_thickness, cv2.LINE_AA)                                                                                        
                                 # draw the boax around the detected object
                                 cv2.rectangle(the_frame, (startX - object_rect_line_thickness, startY + object_rect_line_thickness), (endX + object_rect_line_thickness, endY + 2*(object_rect_line_thickness)), cfg.colorObjectRectangle , object_rect_line_thickness)
-                                cv2.imwrite(f'{base_path}_{datetime.now().strftime("%Y-%m-%d_%H:%M:%S")}_{object["label"]}.{ext}', the_frame, [cv2.IMWRITE_JPEG_QUALITY, 100])
+                                pic_filename = f'{base_path}_{datetime.now().strftime("%Y-%m-%d_%H:%M:%S")}_{object["label"]}.{ext}'
+                                cv2.imwrite(f'{pic_filename}', the_frame, [cv2.IMWRITE_JPEG_QUALITY, 100])
                                         
                                 # print(f" .......", end='\033[K\r') # cleans the whole line but no new line 
-                                print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} objectDetected: {object['label']}", end='\033[K\r') 
+                                # print(f"{pic_filename} - objectDetected: {object['label']}", end='\033[K\n') 
 
                                 #break # with break active only one image will be created per detection round
                                   
