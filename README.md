@@ -44,5 +44,8 @@ import locale
 locale.setlocale(locale.LC_ALL, 'nl_NL.UTF-8')  # prints numbers etc in the Dutch style  like 1.000.000,95
 --------
 
+NEW:  myIPcamrecorder.py
 
+myIPcamrecorder.py is a NEW STANDALONE program to capture streams from your IP camera, detect motion, record the video, display the motion on the screen and detect objects in the recorded video like person, dog, cat, car). Can be customized. Set inside the program for the settings. Simply run python3 myIPcamrecorder.py after you have set your own parameter values. It does NOT use motion events from the camera. The functionality is however similar to the examples above.
+The code is however much more simple than the other examples.  The basis was created with ChatGTP, however ChatGTP did not create a flawless example... on the contrary. But it helped me more than expected.
 
