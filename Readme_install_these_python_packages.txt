@@ -39,6 +39,39 @@ numpy  (numpy-1.26.1 was used)
 psutil
 collections (might be standard installed in python 3.11
 multiprocessing
-easydict
+
 
 Tip: See the imports in the programs to see what else migth be needed. 
+
+IMPORTANT: There is an error in onvif-zeep-async-3.1.12. You need to manually comment some part of the code to get it working.!!
+This is how:
+
+download src package from pypi.org
+unzip and adapt managers.py
+zip and run pip install /storage/emulated/0/Download/onvif-zeep-async-3.1.12.zip
+
+https://github.com/home-assistant/core/blob/dev/homeassistant/components/onvif/event.py#L65
+program python-onvif-zeep-async/onvif/managers.py must have a adaption in try and except part
+
+COMMENT OR DELETE THIS CODE BLOCK in python-onvif-zeep-async/onvif/managers.py!!
+
+async def (self) -> None:
+"""Renew or start notify subscription."""
+if self._shutdown:
+return
+renewal_call_at = None
+try:
+renewal_call_at = (
+await self._renew_subscription()
+)
+except:
+renewal_call_at = (
+await self._restart_subscription()
+)
+finally:
+self._schedule_subscription_renew(
+renewal_call_at
+or self._loop.time()
++ SUBSCRIPTION_RESTART_INTERVAL_ON_ERROR.total_seconds()
+)
+
