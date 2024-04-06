@@ -50,6 +50,8 @@ myIPcamrecorder.py is a NEW STANDALONE program to capture streams from your IP c
 The code is however much more simple than the other examples.  The basis was created with ChatGTP, however ChatGTP did not create a flawless example... on the contrary. But it helped me more than expected.
 
 
+FEATURES
+========
 Note that i have added some variants in one of my repositories.
 
 The latest apps are doing the following once configured via a simple  .ini file and started in a terminal(console) on raspberry pi (or other linux e.g. Ubuntu)
